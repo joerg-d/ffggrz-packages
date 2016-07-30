@@ -1,0 +1,20 @@
+#!/usr/bin/lua
+
+local site = require 'gluon.site_config'
+local uci = require 'luci.model.uci'.cursor()
+
+local radios = {}
+
+-- look for wifi interfaces and add them to the array
+uci:foreach('wireless', 'wifi-device',
+  function(s)
+    table.insert(radios, s['.name'])
+  end
+)
+
+for _, radio in ipairs(radios) do
+  uci:set('wireless', 'mesh_' .. radio, "disabled", 0)
+end
+
+uci:save('wireless')
+uci:commit('wireless')
