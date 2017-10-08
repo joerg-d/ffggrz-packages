@@ -70,7 +70,6 @@ local tunneldigger_enabled = uci:get('tunneldigger', 'mesh_vpn', 'enabled')
 if tunneldigger_enabled == nil then
     tunneldigger_enabled = uci:get_first('tunneldigger', 'broker', 'enabled')
 end
-uci:delete_all('tunneldigger', 'broker')
 
 if has_fastd then
 	if fastd_enabled == nil then
