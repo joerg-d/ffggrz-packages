@@ -66,32 +66,45 @@ local fastd_enabled = uci:get('fastd', 'mesh_vpn', 'enabled')
 
 local has_tunneldigger = fs.access('/lib/gluon/mesh-vpn/tunneldigger')
 local tunneldigger_enabled = uci:get('tunneldigger', 'mesh_vpn', 'enabled')
-
-local enabled
-
--- If the installed VPN package has its enabled state set, keep the value
-if has_fastd and fastd_enabled then
-	enabled = fastd_enabled == '1'
-elseif has_tunneldigger and tunneldigger_enabled then
-	enabled = tunneldigger_enabled == '1'
--- Otherwise, migrate the other package's value if any is set
-elseif fastd_enabled or tunneldigger_enabled then
-	enabled = fastd_enabled == '1' or tunneldigger_enabled == '1'
--- If nothing is set, use the default
-else
-	enabled = site.mesh_vpn.enabled or false
+-- read and delete old tunneldigger config
+if tunneldigger_enabled == nil then
+    tunneldigger_enabled = uci:get_first('tunneldigger', 'broker', 'enabled')
 end
+uci:delete_all('tunneldigger', 'broker')
 
 if has_fastd then
-	uci:set('fastd', 'mesh_vpn', 'enabled', enabled)
+	if fastd_enabled == nil then
+		if tunneldigger_enabled == nil then
+			uci:set('fastd', 'mesh_vpn', 'enabled', site.mesh_vpn.enabled or false)
+		else
+			uci:set('fastd', 'mesh_vpn', 'enabled', tunneldigger_enabled)
+		end
+	else
+		uci:set('fastd', 'mesh_vpn', 'enabled', fastd_enabled)
+	end
 else
 	uci:delete('fastd', 'mesh_vpn')
 end
-uci:save('fastd')
 
 if has_tunneldigger then
-	uci:set('tunneldigger', 'mesh_vpn', 'enabled', enabled)
+	if tunneldigger_enabled == nil then
+		if has_fastd then
+			uci:set('tunneldigger', 'mesh_vpn', 'enabled', false)
+		else
+			if fastd_enabled == nil then
+				uci:set('tunneldigger', 'mesh_vpn', 'enabled', site.mesh_vpn.enabled or false)
+			else
+				uci:set('tunneldigger', 'mesh_vpn', 'enabled', fastd_enabled)
+			end
+		end
+	elseif has_fastd and fastd_enabled then
+		uci:set('tunneldigger', 'mesh_vpn', 'enabled', false)
+	else
+		uci:set('tunneldigger', 'mesh_vpn', 'enabled', tunneldigger_enabled)
+	end
 else
 	uci:delete('tunneldigger', 'mesh_vpn')
 end
+
+uci:save('fastd')
 uci:save('tunneldigger')

@@ -8,6 +8,9 @@ return function(form, uci)
 		return
 	end
 
+local fastd_enabled = uci:get_bool('fastd', 'mesh_vpn', 'enabled')
+local tunneldigger_enabled = uci:get_bool('tunneldigger', 'mesh_vpn', 'enabled')
+
 	local msg = translate(
 		'Your internet connection can be used to establish a ' ..
 	        'VPN connection with other nodes. ' ..
@@ -22,13 +25,21 @@ return function(form, uci)
 	local o
 
 	local meshvpn = s:option(Flag, "meshvpn", translate("Use internet connection (mesh VPN)"))
-	meshvpn.default = uci:get_bool("fastd", "mesh_vpn", "enabled") or uci:get_bool("tunneldigger", "mesh_vpn", "enabled")
+	meshvpn.default = fastd_enabled or tunneldigger_enabled
 	function meshvpn:write(data)
 		if has_fastd then
-			uci:set("fastd", "mesh_vpn", "enabled", data)
+			if has_tunneldigger and tunneldigger_enabled then
+				uci:set("fastd", "mesh_vpn", "enabled", "0")
+			else
+				uci:set("fastd", "mesh_vpn", "enabled", data)
+			end
 		end
 		if has_tunneldigger then
-			uci:set("tunneldigger", "mesh_vpn", "enabled", data)
+			if has_fastd then
+				uci:set("tunneldigger", "mesh_vpn", "enabled", "0")
+			else
+				uci:set("tunneldigger", "mesh_vpn", "enabled", data)
+			end
 		end
 	end
 
