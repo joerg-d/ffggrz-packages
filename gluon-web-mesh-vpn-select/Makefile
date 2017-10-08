@@ -36,4 +36,4 @@ define Package/gluon-web-mesh-vpn-select/install
 	$(call GluonInstallI18N,gluon-mesh-vpn-fastd,gluon-mesh-vpn-tunneldigger,$(1))
 endef
 
-$(eval $(call BuildPackage,gluon-web-mesh-vpn-fastd,gluon-web-mesh-vpn-tunneldigger))
+$(eval $(call BuildPackage,gluon-web-mesh-vpn-select))
