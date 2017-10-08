@@ -11,7 +11,7 @@ include ../gluon.mk
 PKG_CONFIG_DEPENDS += $(GLUON_I18N_CONFIG)
 
 
-define Package/gluon-web-mesh-vpn-fastd
+define Package/gluon-web-mesh-vpn-select
   SECTION:=gluon
   CATEGORY:=Gluon
   TITLE:=gluon-web module to select the type of mesh VPN
