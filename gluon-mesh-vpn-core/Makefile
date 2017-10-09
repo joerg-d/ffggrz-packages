@@ -3,7 +3,7 @@ include $(TOPDIR)/rules.mk
 PKG_NAME:=gluon-mesh-vpn-core
 PKG_VERSION:=1
 
-include $(INCLUDE_DIR)/package.mk
+include $(TOPDIR)/../package/gluon.mk
 
 define Package/gluon-mesh-vpn-core
   SECTION:=gluon
