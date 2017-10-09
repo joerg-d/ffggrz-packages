@@ -35,7 +35,7 @@ local tunneldigger_enabled = uci:get_bool('tunneldigger', 'mesh_vpn', 'enabled')
 			end
 		end
 		if has_tunneldigger then
-			if has_fastd then
+			if has_fastd and fastd_enabled then
 				uci:set("tunneldigger", "mesh_vpn", "enabled", "0")
 			else
 				uci:set("tunneldigger", "mesh_vpn", "enabled", data)
